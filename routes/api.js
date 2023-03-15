@@ -12,6 +12,12 @@ module.exports = function (app) {
 
   app.route('/api/books')
     .get(function (req, res){
+    //  console.log(req)
+    //  const title = req
+    //  if(!title){
+    //    res.json({error:"missing required field title"})
+    //  }
+
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
     })
@@ -19,7 +25,9 @@ module.exports = function (app) {
     .post(function (req, res){
       let title = req.body.title;
       console.log(title)
-      return true
+      if(!title){
+         return res.json({error:"missing required field title"})
+        }
       //response will contain new book object including atleast _id and title
     })
     
