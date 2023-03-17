@@ -7,7 +7,8 @@
 */
 
 'use strict';
-
+const mongoose = require("mongoose");
+const BookModel = require("../model").Book;
 module.exports = function (app) {
 
   app.route('/api/books')
@@ -23,11 +24,25 @@ module.exports = function (app) {
     })
     
     .post(function (req, res){
-      let title = req.body.title;
-      console.log(title)
-      if(!title){
+      let book_title = req.body.title;
+      console.log(book_title)
+      if(!book_title){
          return res.json({error:"missing required field title"})
         }
+
+       const newBook = new BookModel({
+        title:book_title,
+        created_on:new Date(),
+        updated_on:new Date()
+       }) 
+       newBook.save(function (err) {
+        if (err) {
+          res.send("There was an error saving in post");
+        } else {
+          res.json(newBook);
+        }
+      });
+       
       //response will contain new book object including atleast _id and title
     })
     
