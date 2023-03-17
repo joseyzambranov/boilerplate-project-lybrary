@@ -31,9 +31,7 @@ module.exports = function (app) {
         }
 
        const newBook = new BookModel({
-        title:book_title,
-        created_on:new Date(),
-        updated_on:new Date()
+        title:book_title
        }) 
        newBook.save(function (err) {
         if (err) {
