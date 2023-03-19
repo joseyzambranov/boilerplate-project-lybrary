@@ -27,7 +27,7 @@ module.exports = function (app) {
       let book_title = req.body.title;
       console.log(book_title)
       if(!book_title){
-         return res.json({error:"missing required field title"})
+         return res.json("missing required field title")
         }
 
        const newBook = new BookModel({
