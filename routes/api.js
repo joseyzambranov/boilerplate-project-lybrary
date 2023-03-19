@@ -9,16 +9,11 @@
 'use strict';
 const mongoose = require("mongoose");
 const BookModel = require("../model").Book;
+const { ObjectID } = require('mongodb');
 module.exports = function (app) {
 
   app.route('/api/books')
     .get(function (req, res){
-      /*BookModel.find().exec((err,books)=>{
-        if(err){
-          return res.status(500).json({error:err.message});
-        }
-        return res.json(books)
-      })*/
       BookModel.aggregate([
         {
           $lookup: {
@@ -75,6 +70,25 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
+      console.log({bookid})
+      BookModel.aggregate([
+        {$match:{_id:mongoose.Types.ObjectId(bookid)}},
+        {$group:{_id:"$_id",title:{$first:"$title"},comments:{$push:"$commentcount"}}}
+      ]).exec((err,result)=>{
+        if(err){
+          return res.status(500).json({error:err.message})
+        }
+        if(!result||result.length == 0){
+          return res.json("no book exists")
+        }
+        const book = result[0]
+        return res.json({
+          _id:book._id,
+          title:book.title,
+          comments:book.comments
+        })
+        
+      })
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
     })
     
