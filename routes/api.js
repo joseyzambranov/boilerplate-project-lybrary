@@ -13,12 +13,34 @@ module.exports = function (app) {
 
   app.route('/api/books')
     .get(function (req, res){
-    //  console.log(req)
-    //  const title = req
-    //  if(!title){
-    //    res.json({error:"missing required field title"})
-    //  }
-
+      /*BookModel.find().exec((err,books)=>{
+        if(err){
+          return res.status(500).json({error:err.message});
+        }
+        return res.json(books)
+      })*/
+      BookModel.aggregate([
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'bookId',
+            as: 'comments'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            commentcount: { $size: "$comments" }
+          }
+        }
+      ]).exec((err,books)=>{
+        if(err){
+          return res.status(500).json({error:err.message});
+        }
+        return res.json(books)
+      })
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
     })
