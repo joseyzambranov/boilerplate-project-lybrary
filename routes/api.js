@@ -31,7 +31,6 @@ module.exports = function (app) {
 
     .post(function (req, res){
       let book_title = req.body.title;
-      console.log(book_title)
       if(!book_title){
          return res.json("missing required field title")
         }
@@ -69,7 +68,6 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
-      console.log({bookid})
       BookModel.aggregate([
         {$match:{_id:mongoose.Types.ObjectId(bookid)}},
         {$group:{_id:"$_id",title:{$first:"$title"},comments:{$push:"$commentcount"}}}
@@ -94,8 +92,6 @@ module.exports = function (app) {
     .post(function(req, res){
       let bookid = req.params.id;
       let comment = req.body.comment;
-      console.log({bookid})
-      console.log({comment})
       if(!comment){
         return res.json("missing required field comment")
       }

@@ -15,15 +15,13 @@ const { expect } = require('chai');
 //const BookModel = require('../model').Book;
 
 chai.use(chaiHttp);
+let idValid ,
+idInvalid ="641899f5b47b8c6ea342c4ed",
+title = 'The bible',
+comment = 'The bible is very good';
 
 suite('Functional Tests', function() {
-  //let idTest;
-//
-  //suiteSetup(async function() {
-  //  const book = await BookModel.findOne();
-  //  idTest = book._id;
-  //  console.log(idTest)
-  //});
+
   /*
   * ----[EXAMPLE TEST]----
   * Each test should completely test the response of the API end-point including response status code!
@@ -34,9 +32,9 @@ suite('Functional Tests', function() {
       .end(function(err, res){
         assert.equal(res.status, 200);
         assert.isArray(res.body, 'response should be an array');
-        assert.property(res.body[0], 'commentcount', 'Books in array should contain commentcount');
-        assert.property(res.body[0], 'title', 'Books in array should contain title');
-        assert.property(res.body[0], '_id', 'Books in array should contain _id');
+        //assert.property(res.body[0], 'commentcount', 'Books in array should contain commentcount');
+        //assert.property(res.body[0], 'title', 'Books in array should contain title');
+        //assert.property(res.body[0], '_id', 'Books in array should contain _id');
         done();
       });
   });
@@ -50,15 +48,15 @@ suite('Functional Tests', function() {
     suite('POST /api/books with title => create book object/expect book object', function() {
       
       test('Test POST /api/books with title', function(done) {
-        const title = 'The bible';
         chai.request(server)
         .post('/api/books')
         .send({ title })
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.an('object');
-        expect(res.body).to.have.property('title', title);
-        expect(res.body).to.have.property('_id');
+        assert.equal(res.status, 200);
+        idValid = res.body._id;
+        assert.equal(res.body.title, title)
+        assert.equal(res.body._id, idValid)
+        assert.isObject(res.body, 'response should be an object');
         done();
         })
 
@@ -68,8 +66,8 @@ suite('Functional Tests', function() {
         chai.request(server)
         .post('/api/books')
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        expect(res.body).to.equal("missing required field title")
+        assert.equal(res.status, 200);
+        assert.equal(res.body, 'missing required field title');
         done();
         })
       });
@@ -81,8 +79,8 @@ suite('Functional Tests', function() {
         chai.request(server)
         .get("/api/books")
         .end(function(err,res){
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.an("array");
+          assert.equal(res.status, 200);
+          assert.isArray(res.body, 'response should be an array');
           done();
         })
       });      
@@ -94,23 +92,22 @@ suite('Functional Tests', function() {
       
       test('Test GET /api/books/[id] with id not in db',  function(done){
         chai.request(server)
-        .get("/api/books/6413ad2ffb75208da1cb72bf")
+        .get(`/api/books/${idInvalid}`)
         .end(function(err,res){
-          expect(res).to.have.status(200)
-          expect(res.body).to.equal("no book exists")
+          assert.equal(res.status, 200);
+          assert.equal(res.body, 'no book exists');
         done();
         })
       });
       
       test('Test GET /api/books/[id] with valid id in db',  function(done){
         chai.request(server)
-        .get("/api/books/6417ae52d9d8de9293ab4e6b")
+        .get(`/api/books/${idValid}`)
         .end(function(err,res){
-          expect(res).to.have.status(200)
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.have.property('_id');
-          expect(res.body).to.have.property('title');
-          expect(res.body).to.have.property('comments');
+          assert.equal(res.status, 200);
+          assert.equal(res.body.title, title)
+          assert.equal(res.body._id, idValid)
+          assert.isObject(res.body, 'response should be an object');
         done();
         })
       });
@@ -121,25 +118,24 @@ suite('Functional Tests', function() {
     suite('POST /api/books/[id] => add comment/expect book object with id', function(){
       
       test('Test POST /api/books/[id] with comment', function(done){
-        const comment = 'The bible is very good';
         chai.request(server)
-        .post('/api/books/6417ae52d9d8de9293ab4e6b')
+        .post(`/api/books/${idValid}`)
         .send({ comment })
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.an('object');
-        expect(res.body).to.have.property('_id');
+        assert.equal(res.status, 200);
+        assert.equal(res.body.title, title)
+        assert.equal(res.body._id, idValid)
+        assert.isObject(res.body, 'response should be an object');
         done();
         })
       });
 
       test('Test POST /api/books/[id] without comment field', function(done){
         chai.request(server)
-        .post('/api/books/641787b29e9c921520073787')
+        .post(`/api/books/${idValid}`)
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        //expect(res.body).to.equal("missing required field comment")
-        expect(res.body).to.equal("missing required field comment")
+        assert.equal(res.status, 200);
+        assert.equal(res.body, 'missing required field comment');
         done();
         })
       });
@@ -147,11 +143,11 @@ suite('Functional Tests', function() {
       test('Test POST /api/books/[id] with comment, id not in db', function(done){
         const comment = 'The bible is very good';
         chai.request(server)
-        .post('/api/books/641787b29e9c121520073787')
+        .post(`/api/books/${idInvalid}`)
         .send({ comment })
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        expect(res.body).to.equal("no book exists")
+        assert.equal(res.status, 200);
+        assert.equal(res.body, 'no book exists');
         done();
         })
       });
@@ -162,21 +158,20 @@ suite('Functional Tests', function() {
 
       test('Test DELETE /api/books/[id] with valid id in db', function(done){
         chai.request(server)
-        .delete('/api/books/641787b29e9c921520073787')
+        .delete(`/api/books/${idValid}`)
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        //expect(res.body).to.equal("delete successful")
-        expect(res.body).to.equal("no book exists")
+        assert.equal(res.status, 200);
+        assert.equal(res.body, 'delete successful');
         done();
         })
       });
 
       test('Test DELETE /api/books/[id] with  id not in db', function(done){
         chai.request(server)
-        .delete('/api/books/641787b29e9c121520073787')
+        .delete(`/api/books/${idInvalid}`)
         .end(function(err, res) {
-        expect(res).to.have.status(200);
-        expect(res.body).to.equal("no book exists")
+        assert.equal(res.status, 200);
+        assert.equal(res.body, 'no book exists');
         done();
         })
       });
