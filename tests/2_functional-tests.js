@@ -104,7 +104,7 @@ suite('Functional Tests', function() {
       
       test('Test GET /api/books/[id] with valid id in db',  function(done){
         chai.request(server)
-        .get("/api/books/6417a4549f2e5893828f4512")
+        .get("/api/books/6417ae52d9d8de9293ab4e6b")
         .end(function(err,res){
           expect(res).to.have.status(200)
           expect(res.body).to.be.an('object');
@@ -123,7 +123,7 @@ suite('Functional Tests', function() {
       test('Test POST /api/books/[id] with comment', function(done){
         const comment = 'The bible is very good';
         chai.request(server)
-        .post('/api/books/6417a4549f2e5893828f4512')
+        .post('/api/books/6417ae52d9d8de9293ab4e6b')
         .send({ comment })
         .end(function(err, res) {
         expect(res).to.have.status(200);
