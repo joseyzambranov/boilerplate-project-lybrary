@@ -21,6 +21,9 @@ title = 'The bible',
 comment = 'The bible is very good';
 
 suite('Functional Tests', function() {
+  after(function() {
+    chai.request(server).get('/api/books')
+});
 
   /*
   * ----[EXAMPLE TEST]----
